@@ -52,8 +52,17 @@
         }
       }
       h1 {
-        font-size: 2rem;
         margin-bottom: 1rem;
+        line-height: 1.2;
+      }
+      h1 .brand {
+        font-size: clamp(2.6rem, 6vw, 3.4rem);
+        font-weight: 800;
+        display: inline-block;
+      }
+      h1 .tagline {
+        font-size: 0.95rem;
+        font-weight: 500;
       }
       #bubble {
         width: 150px;
@@ -169,7 +178,8 @@
   </head>
   <body>
     <h1>
-      🫧 ENmote<br />色で感じ、言葉で寄り添う。こころの空を映し出す翻訳AIアプリ
+      <span class="brand">🫧 ENmote</span><br />
+      <span class="tagline">色で感じ、言葉で寄り添う。こころの空を映し出す翻訳AIアプリ</span>
     </h1>
     <p>シャボン玉に、今日の色を映してみませんか？</p>
 
