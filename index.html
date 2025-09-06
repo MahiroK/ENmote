@@ -56,13 +56,23 @@
         line-height: 1.2;
       }
       h1 .brand {
-        font-size: clamp(2.6rem, 6vw, 3.4rem);
+        font-size: clamp(3rem, 7.5vw, 4rem);
         font-weight: 800;
         display: inline-block;
       }
       h1 .tagline {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-weight: 500;
+      }
+      .callout {
+        display: inline-block;
+        padding: 0.6rem 1.1rem;
+        margin: 0.4rem 0 0.2rem;
+        background: rgba(255, 255, 255, 0.78);
+        color: #0354ce;
+        border-radius: 9999px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        backdrop-filter: saturate(120%) blur(2px);
       }
       #bubble {
         width: 150px;
@@ -178,11 +188,10 @@
   </head>
   <body>
     <h1>
-      <span class="brand">🫧 ENmote<br />
-      <span class="tagline"
-        >色で感じ、言葉で寄り添う。こころの空を映し出す翻訳AIパートナー
+      <span class="brand">🫧 ENmote</span><br />
+      <span class="tagline">色で感じ、言葉で寄り添う。こころの空を映し出す翻訳AIパートナー</span>
     </h1>
-    <p>シャボン玉に、今日の色を映してみませんか？</p>
+    <p class="callout">シャボン玉に、今日の色を映してみませんか？</p>
 
     <div id="bubble" onclick="openPicker()"></div>
     <input type="color" id="colorPicker" onchange="colorSelected()" />
