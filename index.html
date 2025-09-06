@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ENmote｜こころの天気予報</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background: #f5f9ff;
+        color: #0354ce;
+        margin: 0;
+        padding: 2rem;
+        text-align: center;
+        display: flex; /* 中央寄せのために追加 */
+        justify-content: center; /* 水平方向の中央寄せ */
+        align-items: center; /* 垂直方向の中央寄せ */
+        flex-direction: column; /* 要素を縦に並べる */
+        height: 100vh; /* 画面全体を占める */
+      }
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+      #bubble {
+        width: 150px;
+        height: auto; /* 高さを自動にして aspect-ratio に任せる */
+        aspect-ratio: 1 / 1; /* 正方形を維持 */
+        border-radius: 50%;
+        border: 3px solid rgba(0, 0, 0, 0.1);
+        background: transparent;
+        margin: 2rem auto;
+        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.5),
+          0 0 8px rgba(173, 216, 230, 0.5);
+        cursor: pointer;
+        transition: box-shadow 0.3s ease, background 0.3s ease;
+        position: relative; /* 親要素の影響を排除 */
+      }
+      #bubble:hover {
+        box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.7),
+          0 0 12px rgba(173, 216, 230, 0.8);
+      }
+      #colorPicker,
+      #noteInput,
+      #saveBtn,
+      #resetBtn {
+        display: none;
+      }
+      input[type="color"] {
+        width: 0;
+        height: 0;
+        opacity: 0;
+        visibility: hidden;
+      }
+      textarea {
+        width: 80%; /* 固定幅 */
+        max-width: 800px; /* 最大幅を設定 */
+        height: 100px; /* 固定高さ */
+        margin: 1rem auto; /* 自動で中央寄せ */
+        padding: 0.5rem;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        resize: none; /* サイズ変更を無効化 */
+        box-sizing: border-box; /* パディングを含めた幅と高さを計算 */
+      }
+      button {
+        padding: 0.7rem 1.5rem;
+        font-size: 1rem;
+        border: none;
+        border-radius: 8px;
+        background: #7dcfb6;
+        color: white;
+        cursor: pointer;
+        margin: 0.5rem;
+      }
+      .entry {
+        background: #fff;
+        padding: 1.5rem; /* 余白を広げる */
+        border-radius: 10px;
+        margin: 1rem auto;
+        width: 95%; /* 横幅を広げる */
+        max-width: 800px; /* 最大幅を設定 */
+        min-height: 120px; /* 最低限の高さを少し増やす */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        text-align: left;
+        position: relative;
+        line-height: 1.6; /* 行間を広げる */
+        word-wrap: break-word; /* 長い単語やURLを折り返す */
+      }
+      .color-dot {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+        vertical-align: middle;
+      }
+      .date {
+        font-size: 0.9rem;
+        color: #666;
+      }
+      .note {
+        margin-top: 0.5rem;
+      }
+      .deleteBtn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background: #f76c6c;
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+      }
+      .talkBtn {
+        margin-top: 0.8rem;
+        display: inline-block;
+        font-size: 0.9rem;
+        color: #4a90e2;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      #enmoteBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #a2d2ff;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🫧 ENmote｜心の天気予報</h1>
+    <p>シャボン玉に、今日の色を映してみませんか？</p>
+
+    <div id="bubble" onclick="openPicker()"></div>
+    <input type="color" id="colorPicker" onchange="colorSelected()" />
+    <textarea
+      id="noteInput"
+      placeholder="振り返りのひとことメモを残すこともできます"
+    ></textarea
+    ><br />
+    <button id="saveBtn" onclick="saveEntry()">記録する</button>
+    <button id="resetBtn" onclick="resetColor()">戻る</button>
+
+    <h2>🗓️ 過去の記録</h2>
+    <div id="entries"></div>
+
+    <button id="enmoteBtn" onclick="talkToENmote()">
+      ENmoteと話す（マイGPTに遷移します）
+    </button>
+
+    <script>
+      const bubble = document.getElementById("bubble");
+      const colorPicker = document.getElementById("colorPicker");
+      const noteInput = document.getElementById("noteInput");
+      const saveBtn = document.getElementById("saveBtn");
+      const resetBtn = document.getElementById("resetBtn");
+
+      function openPicker() {
+        colorPicker.click();
+      }
+
+      function colorSelected() {
+        const color = colorPicker.value;
+        bubble.style.background = color;
+        noteInput.style.display = "block";
+        saveBtn.style.display = "inline-block";
+        resetBtn.style.display = "inline-block";
+      }
+
+      function resetColor() {
+        bubble.style.background = "transparent";
+        noteInput.style.display = "none";
+        saveBtn.style.display = "none";
+        resetBtn.style.display = "none";
+        colorPicker.value = "#ffffff";
+        noteInput.value = "";
+      }
+
+      function saveEntry() {
+        const color = colorPicker.value;
+        const note = noteInput.value;
+        const date = new Date().toLocaleDateString("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        });
+
+        const entry = { color, note, date };
+        const existing = JSON.parse(localStorage.getItem("emotionLog")) || [];
+        existing.unshift(entry);
+        localStorage.setItem("emotionLog", JSON.stringify(existing));
+        resetColor();
+        renderEntries();
+      }
+
+      function deleteEntry(index) {
+        const existing = JSON.parse(localStorage.getItem("emotionLog")) || [];
+        existing.splice(index, 1);
+        localStorage.setItem("emotionLog", JSON.stringify(existing));
+        renderEntries();
+      }
+
+      function renderEntries() {
+        const container = document.getElementById("entries");
+        container.innerHTML = "";
+        const entries = JSON.parse(localStorage.getItem("emotionLog")) || [];
+
+        entries.forEach((entry, index) => {
+          const colorParam = encodeURIComponent(entry.color);
+          const noteParam = encodeURIComponent(entry.note || "");
+          const gptUrl = `https://chatgpt.com/g/g-68bbf302e6b08191a562d2cbcacdd3a7-enmote`;
+
+          const div = document.createElement("div");
+          div.className = "entry";
+
+          const copyText = `色: ${entry.color}\nメモ: ${
+            entry.note || "(なし)"
+          }`;
+
+          div.innerHTML = `
+      <div><span class="color-dot" style="background:${entry.color}"></span>
+        <strong>${entry.color}</strong>
+      </div>
+      <div class="date">📅 ${entry.date}</div>
+      ${entry.note ? `<div class="note">💬 ${entry.note}</div>` : ""}
+      <div class="talkBtn" onclick="window.open('${gptUrl}', '_blank')">💬 ENmoteに話しかける</div>
+
+      <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #555;">
+        📋 コピーしてENmoteに貼り付けてください：
+        <pre style="background:#f0f0f0;padding:0.5rem;border-radius:6px;margin-top:0.2rem;">${copyText}</pre>
+        <button onclick="navigator.clipboard.writeText(\`${copyText}\`).then(() => { 
+          alert('コピーが完了しました！'); 
+        }).catch(err => { 
+          alert('コピーに失敗しました: ' + err); 
+        })">📎 コピー</button>
+      </div>
+
+      <button class="deleteBtn" onclick="deleteEntry(${index})">削除</button>
+    `;
+
+          container.appendChild(div);
+        });
+      }
+
+      function talkToENmote() {
+        window.open(
+          "https://chatgpt.com/g/g-68bbf302e6b08191a562d2cbcacdd3a7-enmote"
+        );
+      }
+
+      renderEntries();
+    </script>
+  </body>
+</html>
