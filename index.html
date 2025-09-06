@@ -7,7 +7,21 @@
     <style>
       body {
         font-family: "Arial", sans-serif;
-        background: #f5f9ff;
+        /* 虹色のアニメーション背景 */
+        background: linear-gradient(
+          120deg,
+          #ff9a9e,
+          #fad0c4,
+          #fbc2eb,
+          #a6c1ee,
+          #84fab0,
+          #8fd3f4,
+          #a1c4fd,
+          #ffecd2
+        );
+        background-size: 400% 400%;
+        background-attachment: fixed;
+        animation: rainbowShift 22s ease infinite;
         color: #0354ce;
         margin: 0;
         padding: 2rem;
@@ -17,6 +31,25 @@
         align-items: center; /* 垂直方向の中央寄せ */
         flex-direction: column; /* 要素を縦に並べる */
         height: 100vh; /* 画面全体を占める */
+      }
+
+      @keyframes rainbowShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      /* 動きを抑えたいOS設定に従う */
+      @media (prefers-reduced-motion: reduce) {
+        body {
+          animation: none;
+        }
       }
       h1 {
         font-size: 2rem;
